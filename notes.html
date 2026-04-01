@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Заметки — папки</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <main class="app">
+      <header class="topbar">
+        <div class="notes-hero">
+          <div class="brand">Заметки по папкам</div>
+          <div class="subtitle">
+            Создайте папки — например «Работа», «Учёба» — и внутри каждой храните отдельные заметки. Всё сохраняется в браузере.
+          </div>
+        </div>
+        <div class="top-actions">
+          <span id="authUser" class="auth-slot"></span>
+          <nav class="top-nav" aria-label="Разделы">
+            <a href="./index.html" class="nav-pill">Календарь</a>
+            <a href="./notes.html" class="nav-pill is-active" aria-current="page">Заметки</a>
+          </nav>
+        </div>
+      </header>
+
+      <div class="notes-workspace">
+        <aside class="notes-folders card" aria-label="Папки заметок">
+          <div class="notes-folders-head">
+            <h2 class="notes-folders-title">Папки</h2>
+            <button type="button" class="btn btn-sm" id="btnNewFolder" title="Новая папка">+ Папка</button>
+          </div>
+          <div id="folderList" class="folder-list"></div>
+        </aside>
+
+        <section class="notes-main card">
+          <div id="notesEmptyState" class="notes-empty-state">
+            <div class="notes-empty-icon" aria-hidden="true">📂</div>
+            <p>Выберите папку слева, чтобы увидеть заметки внутри.</p>
+          </div>
+
+          <div id="notesMainContent" class="notes-main-content" hidden>
+            <div class="notes-main-toolbar">
+              <div class="notes-main-title-wrap">
+                <h2 id="openFolderTitle" class="notes-main-title">—</h2>
+                <span id="notesSaveStatus" class="notes-status" aria-live="polite"></span>
+              </div>
+              <div class="notes-main-actions">
+                <button type="button" class="btn btn-sm" id="btnRenameFolder" title="Переименовать папку">✎</button>
+                <button type="button" class="btn btn-sm btn-ghost" id="btnDeleteFolder" title="Удалить папку">Удалить папку</button>
+                <button type="button" class="btn" id="btnNewNote">+ Новая заметка</button>
+              </div>
+            </div>
+
+            <div class="notes-split">
+              <div id="notesListWrap" class="notes-list-wrap">
+                <div id="notesList" class="notes-item-list"></div>
+              </div>
+              <div id="noteEditorWrap" class="note-editor-wrap" hidden>
+                <div class="note-editor-head">
+                  <span class="note-editor-label">Редактирование</span>
+                  <button type="button" class="mini-btn" id="btnCloseEditor" title="Закрыть редактор" aria-label="Закрыть">×</button>
+                </div>
+                <div class="field note-title-field">
+                  <label class="label" for="noteEditorTitle">Название заметки</label>
+                  <input
+                    id="noteEditorTitle"
+                    class="input note-editor-title-input"
+                    type="text"
+                    maxlength="120"
+                    placeholder="Например: Созвон с командой"
+                  />
+                </div>
+                <label class="label note-body-label" for="noteEditorBody">Текст</label>
+                <textarea
+                  id="noteEditorBody"
+                  class="textarea-glass note-editor-textarea"
+                  spellcheck="true"
+                  rows="14"
+                  placeholder="Подробности, списки, мысли…"
+                ></textarea>
+                <div class="modal-note-hint">Сохраняется автоматически при вводе</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="./api-client.js"></script>
+    <script src="./notes.js" defer></script>
+  </body>
+</html>

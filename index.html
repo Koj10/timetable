@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Глосмористичный календарь</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <div class="brand">Глосмористичный календарь</div>
+          <div class="subtitle">Кружки по цветам ставятся на даты (клик или drag&drop)</div>
+        </div>
+        <div class="top-actions">
+          <span id="authUser" class="auth-slot"></span>
+          <nav class="top-nav" aria-label="Разделы">
+            <a href="./index.html" class="nav-pill is-active" aria-current="page">Календарь</a>
+            <a href="./notes.html" class="nav-pill">Заметки</a>
+          </nav>
+          <button id="btnReset" class="btn btn-ghost" type="button" title="Очистить все данные">Сброс</button>
+        </div>
+      </header>
+
+      <section class="layout">
+        <section class="card calendar-card">
+          <div class="calendar-header">
+            <button id="btnPrev" class="icon-btn" type="button" aria-label="Предыдущий месяц" title="Назад">
+              <span aria-hidden="true">‹</span>
+            </button>
+
+            <div class="month-title">
+              <div id="monthLabel" class="month-label">Месяц</div>
+              <div class="hint" id="monthHint">Выберите цвет и нажмите на дату</div>
+            </div>
+
+            <button id="btnNext" class="icon-btn" type="button" aria-label="Следующий месяц" title="Вперёд">
+              <span aria-hidden="true">›</span>
+            </button>
+          </div>
+
+          <div class="dow">
+            <div class="dow-cell">Пн</div>
+            <div class="dow-cell">Вт</div>
+            <div class="dow-cell">Ср</div>
+            <div class="dow-cell">Чт</div>
+            <div class="dow-cell">Пт</div>
+            <div class="dow-cell">Сб</div>
+            <div class="dow-cell">Вс</div>
+          </div>
+
+          <div id="calendarGrid" class="calendar-grid" role="grid" aria-label="Календарь"></div>
+        </section>
+
+        <aside class="side">
+          <section class="card colors-card">
+            <div class="card-title-row">
+              <h2 class="card-title">Цвета и задачи</h2>
+            </div>
+
+            <div class="color-add">
+              <div class="field">
+                <label class="label" for="newColorHex">Цвет</label>
+                <input id="newColorHex" class="input" type="color" value="#7c5cff" />
+              </div>
+              <div class="field">
+                <label class="label" for="newColorName">Название</label>
+                <input id="newColorName" class="input" type="text" placeholder="Например: Работа" maxlength="40" />
+              </div>
+              <button id="btnAddColor" class="btn" type="button">+ Добавить цвет</button>
+            </div>
+
+            <p class="colors-scroll-hint">Список цветов и задач прокручивается внутри этого окна</p>
+
+            <div class="colors-list-wrap" aria-label="Список цветов, прокрутка">
+              <div class="colors-list" id="colorsList"></div>
+            </div>
+          </section>
+
+          <section class="card help-card">
+            <h2 class="card-title">Как пользоваться</h2>
+            <div class="help">
+              <div class="help-item"><span class="kbd">1</span> Выберите цвет (он станет активным).</div>
+              <div class="help-item"><span class="kbd">2</span> Кликните по дате, чтобы поставить/снять кружок.</div>
+              <div class="help-item"><span class="kbd">3</span> Можно перетаскивать кружок из списка на дату.</div>
+              <div class="help-item"><span class="kbd">4</span> У каждого цвета есть список задач — что означает кружок на даты.</div>
+              <div class="help-item"><span class="kbd">5</span> Задержите курсор на дне ~0,7 с — откроется окно с подробностями и заметкой к дню.</div>
+            </div>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <!-- Модальное окно дня (открывается при удержании курсора на ячейке) -->
+    <div id="dayModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="dayModalTitle" hidden>
+      <div class="modal-backdrop" data-modal-close></div>
+      <div class="modal-panel card">
+        <div class="modal-glow" aria-hidden="true"></div>
+        <header class="modal-head">
+          <div>
+            <div id="dayModalTitle" class="modal-title">День</div>
+            <div id="dayModalSubtitle" class="modal-subtitle"></div>
+          </div>
+          <button type="button" class="icon-btn modal-close" id="dayModalClose" aria-label="Закрыть">×</button>
+        </header>
+        <div class="modal-body">
+          <section class="modal-section">
+            <h3 class="modal-section-title">Метки и задачи</h3>
+            <div id="dayModalDots" class="day-detail-list"></div>
+          </section>
+          <section class="modal-section">
+            <h3 class="modal-section-title">Заметка к этому дню</h3>
+            <textarea
+              id="dayModalNote"
+              class="textarea-glass"
+              rows="6"
+              placeholder="Напишите, что важно помнить в этот день…"
+            ></textarea>
+            <div class="modal-note-hint" id="dayModalNoteHint">Сохраняется автоматически</div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <script src="./api-client.js"></script>
+    <script src="./app.js" defer></script>
+  </body>
+</html>
+

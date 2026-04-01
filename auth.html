@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Вход и регистрация</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <main class="app auth-page">
+      <header class="topbar">
+        <div>
+          <div class="brand">Аккаунт</div>
+          <div class="subtitle">Войдите или зарегистрируйтесь — календарь и заметки сохранятся на сервере.</div>
+        </div>
+        <nav class="top-nav" aria-label="Разделы">
+          <a href="./index.html" class="nav-pill">Календарь</a>
+          <a href="./notes.html" class="nav-pill">Заметки</a>
+          <span class="nav-pill is-active" aria-current="page">Вход</span>
+        </nav>
+      </header>
+
+      <section class="card auth-card">
+        <h1 class="auth-heading">Вход</h1>
+        <form id="formLogin" class="auth-form" autocomplete="on">
+          <div class="field">
+            <label class="label" for="loginEmail">Email</label>
+            <input id="loginEmail" name="email" class="input" type="email" required autocomplete="username" />
+          </div>
+          <div class="field">
+            <label class="label" for="loginPass">Пароль</label>
+            <input id="loginPass" name="password" class="input" type="password" required autocomplete="current-password" />
+          </div>
+          <p id="loginErr" class="auth-err" role="alert"></p>
+          <button type="submit" class="btn auth-submit">Войти</button>
+        </form>
+
+        <h2 class="auth-heading auth-heading-sub">Регистрация</h2>
+        <form id="formRegister" class="auth-form" autocomplete="on">
+          <div class="field">
+            <label class="label" for="regEmail">Email</label>
+            <input id="regEmail" name="email" class="input" type="email" required autocomplete="email" />
+          </div>
+          <div class="field">
+            <label class="label" for="regPass">Пароль (минимум 6 символов)</label>
+            <input id="regPass" name="password" class="input" type="password" required minlength="6" autocomplete="new-password" />
+          </div>
+          <p id="regErr" class="auth-err" role="alert"></p>
+          <button type="submit" class="btn auth-submit">Создать аккаунт</button>
+        </form>
+
+        <p class="auth-hint">
+          Запускайте приложение командой <code class="auth-code">npm start</code> и открывайте
+          <code class="auth-code">http://localhost:3000</code> — при открытии файла с диска (file://) вход не работает.
+        </p>
+      </section>
+    </main>
+
+    <script src="./api-client.js"></script>
+    <script>
+      (function () {
+        function showErr(el, msg) {
+          if (el) el.textContent = msg || "";
+        }
+
+        document.getElementById("formLogin").addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const err = document.getElementById("loginErr");
+          showErr(err, "");
+          const email = document.getElementById("loginEmail").value.trim();
+          const password = document.getElementById("loginPass").value;
+          try {
+            const r = await fetch("/api/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: email, password: password }),
+            });
+            const j = await r.json().catch(function () {
+              return {};
+            });
+            if (!r.ok) {
+              showErr(err, j.error || "Ошибка входа");
+              return;
+            }
+            if (j.token) {
+              await window.authSync.syncAfterLogin(j.token);
+              location.href = "./index.html";
+            }
+          } catch {
+            showErr(err, "Не удалось связаться с сервером. Запустите npm start.");
+          }
+        });
+
+        document.getElementById("formRegister").addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const err = document.getElementById("regErr");
+          showErr(err, "");
+          const email = document.getElementById("regEmail").value.trim();
+          const password = document.getElementById("regPass").value;
+          try {
+            const r = await fetch("/api/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: email, password: password }),
+            });
+            const j = await r.json().catch(function () {
+              return {};
+            });
+            if (!r.ok) {
+              showErr(err, j.error || "Ошибка регистрации");
+              return;
+            }
+            if (j.token) {
+              await window.authSync.syncAfterLogin(j.token);
+              location.href = "./index.html";
+            }
+          } catch {
+            showErr(err, "Не удалось связаться с сервером. Запустите npm start.");
+          }
+        });
+
+        if (window.authSync && window.authSync.isLoggedIn()) {
+          location.href = "./index.html";
+        }
+      })();
+    </script>
+  </body>
+</html>
