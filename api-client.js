@@ -131,10 +131,10 @@
     if (!token) {
       if (hasGuestDraft()) {
         slot.innerHTML =
-          '<button type="button" class="btn btn-sm" data-auth-save-draft>Сохранить изменения</button> <a href="./auth.html" class="nav-pill">Войти</a>';
+          '<a href="./auth.html" class="nav-pill auth-action">Вход</a> <button type="button" class="btn btn-sm auth-action" data-auth-save-draft>Сохранить изменения</button>';
       } else {
         slot.innerHTML =
-          '<a href="./auth.html" class="nav-pill">Войти</a>';
+          '<a href="./auth.html" class="nav-pill auth-action">Вход</a>';
       }
       return;
     }
@@ -151,7 +151,7 @@
         '</span> <button type="button" class="btn btn-sm btn-ghost" data-auth-logout>Выйти</button>';
     } catch {
       slot.innerHTML =
-        '<a href="./auth.html" class="nav-pill">Войти</a> <span class="auth-email" title="Офлайн">офлайн</span>';
+        '<a href="./auth.html" class="nav-pill auth-action">Вход</a> <span class="auth-email" title="Офлайн">офлайн</span>';
     }
   }
 

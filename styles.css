@@ -46,34 +46,35 @@ body{
 
 .topbar{
   display:flex;
-  align-items:flex-start;
+  align-items:center;
   justify-content:space-between;
-  gap:16px;
-  margin-bottom: 16px;
+  gap:10px;
+  margin-bottom: 12px;
 }
 .brand{
   font-weight: 820;
   letter-spacing: .2px;
-  font-size: 18px;
+  font-size: 17px;
 }
 .subtitle{
-  margin-top: 6px;
+  margin-top: 4px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
+  line-height: 1.35;
 }
 .top-actions{
   display:flex;
   flex-wrap:wrap;
   align-items:center;
   justify-content:flex-end;
-  gap:10px;
+  gap:7px;
 }
 .auth-slot{
   display:inline-flex;
   align-items:center;
-  gap:8px;
+  gap:6px;
   flex-wrap:wrap;
-  max-width: min(100%, 280px);
+  max-width: min(100%, 240px);
   justify-content:flex-end;
 }
 .auth-email{
@@ -83,6 +84,24 @@ body{
   text-overflow:ellipsis;
   white-space:nowrap;
   max-width: 160px;
+}
+.auth-action{
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255,255,255,.9);
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.04);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
+}
+.auth-action:hover{
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.2);
+}
+.auth-slot .btn.auth-action{
+  height: 32px;
 }
 
 .auth-page .auth-card{
@@ -131,9 +150,9 @@ body{
 
 .top-nav{
   display:flex;
-  gap:8px;
-  padding: 4px;
-  border-radius: 14px;
+  gap:6px;
+  padding: 3px;
+  border-radius: 12px;
   border: 1px solid rgba(255,255,255,.12);
   background: rgba(255,255,255,.05);
   backdrop-filter: blur(10px);
@@ -142,9 +161,10 @@ body{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  padding: 8px 14px;
-  border-radius: 11px;
-  font-size: 13px;
+  padding: 6px 10px;
+  min-height: 32px;
+  border-radius: 10px;
+  font-size: 12px;
   font-weight: 750;
   color: rgba(255,255,255,.72);
   text-decoration:none;
@@ -531,7 +551,12 @@ body{
   margin-top: 10px;
 }
 .task-input{
-  flex:1;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.task-row .btn{
+  flex: 0 0 132px;
+  white-space: nowrap;
 }
 .tasks{
   margin-top: 8px;
@@ -1087,5 +1112,268 @@ body.modal-open{
   font-family: inherit;
   line-height: 1.55;
   flex: 0 1 auto;
+}
+
+/* —— Adaptive layout tune-up —— */
+@media (max-width: 900px){
+  .app{
+    margin: 16px auto;
+    padding: 0 12px 20px;
+  }
+
+  .topbar{
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    padding: 8px 8px 10px;
+    margin: 0 -2px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: linear-gradient(180deg, rgba(8,12,26,.9), rgba(8,12,26,.74));
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .topbar .subtitle{
+    max-width: 42ch;
+    font-size: 12px;
+  }
+
+  .top-actions{
+    width: 100%;
+    justify-content: flex-start;
+    gap: 6px;
+  }
+
+  .auth-slot{
+    max-width: 100%;
+    justify-content: flex-start;
+  }
+
+  .top-nav{
+    width: 100%;
+    padding: 3px;
+  }
+
+  .top-nav .nav-pill{
+    flex: 1 1 0;
+    min-height: 34px;
+  }
+
+  .layout{
+    gap: 12px;
+  }
+
+  .calendar-card,
+  .colors-card,
+  .help-card,
+  .notes-folders{
+    padding: 12px;
+  }
+
+  .dow,
+  .calendar-grid{
+    gap: 6px;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  .day{
+    min-height: 66px;
+  }
+
+  .day-num{
+    padding: 8px 8px 0;
+    font-size: 12px;
+  }
+
+  .dots{
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    gap: 5px;
+  }
+
+  .dot{
+    width: 12px;
+    height: 12px;
+  }
+
+  .notes-main-content{
+    min-height: auto;
+    max-width: none;
+    padding: 12px;
+  }
+
+  .notes-split{
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .notes-list-wrap{
+    max-height: min(40vh, 360px);
+  }
+
+  .note-editor-textarea{
+    min-height: 180px;
+    max-height: min(42vh, 360px);
+  }
+
+  .modal{
+    padding: 12px;
+  }
+
+  .modal-panel{
+    max-height: min(92vh, 760px);
+  }
+}
+
+@media (max-width: 640px){
+  .topbar .subtitle{
+    display: none;
+  }
+
+  .topbar{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .topbar > div:first-child{
+    width: 100%;
+  }
+
+  .top-actions{
+    display: grid;
+    width: 100%;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "auth auth"
+      "nav nav";
+    gap: 7px;
+    align-items: center;
+  }
+
+  .auth-slot{
+    grid-area: auth;
+    display: flex;
+    justify-content: stretch;
+    align-items: center;
+    gap: 7px;
+    max-width: 100%;
+  }
+
+  .auth-slot .nav-pill,
+  .auth-slot .btn{
+    flex: 1 1 50%;
+    min-width: 0;
+    justify-content: center;
+    text-align: center;
+    min-height: 36px;
+  }
+
+  .auth-slot .auth-action{
+    min-height: 36px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+
+  .auth-slot .btn.auth-action{
+    height: 36px;
+  }
+
+  #btnReset{
+    min-width: 88px;
+    justify-self: start;
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .top-nav{
+    grid-column: 2;
+    grid-row: 2;
+    width: 100%;
+  }
+
+  .brand{
+    font-size: 15px;
+  }
+
+  .month-label{
+    font-size: 16px;
+  }
+
+  .hint{
+    font-size: 11px;
+  }
+
+  .icon-btn{
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+  }
+
+  .dow-cell{
+    font-size: 11px;
+  }
+
+  .day{
+    min-height: 56px;
+    border-radius: 11px;
+  }
+
+  .day-num{
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .colors-scroll-hint,
+  .help-card{
+    display: none;
+  }
+
+  .color-add{
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .task-row{
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .task-row .btn{
+    width: 100%;
+    flex: 0 0 auto;
+    height: 38px;
+  }
+
+  .notes-main-actions{
+    width: 100%;
+  }
+
+  .notes-main-actions .btn{
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .note-row-main{
+    padding: 11px 10px;
+  }
+
+  .modal-head{
+    padding: 14px 14px 10px;
+  }
+
+  .modal-body{
+    padding: 12px 14px 14px;
+    gap: 12px;
+  }
+
+  .textarea-glass{
+    min-height: 120px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
 }
 
