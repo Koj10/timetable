@@ -4,6 +4,7 @@
  */
 (function (global) {
   const STORAGE_KEY = "glosmoSchedule-v1";
+  const GUEST_STORAGE_KEY = "glosmoSchedule-guest-v1";
   const TOKEN_KEY = "glosmoAuthToken";
 
   let uploadTimer = null;
@@ -32,6 +33,42 @@
     if (Array.isArray(payload.noteFolders) && payload.noteFolders.length > 0) return true;
     if (payload.dayNotes && Object.keys(payload.dayNotes).length > 0) return true;
     return false;
+  }
+
+  function getStorageKey() {
+    return isLoggedIn() ? STORAGE_KEY : GUEST_STORAGE_KEY;
+  }
+
+  function readPayloadByKey(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      const payload = JSON.parse(raw);
+      return payload && typeof payload === "object" ? payload : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function readActivePayload() {
+    return readPayloadByKey(getStorageKey());
+  }
+
+  function writeActivePayload(payload) {
+    const key = getStorageKey();
+    localStorage.setItem(key, JSON.stringify(payload));
+  }
+
+  function clearActivePayload() {
+    localStorage.removeItem(getStorageKey());
+  }
+
+  function hasGuestDraft() {
+    return hasMeaningfulPayload(readPayloadByKey(GUEST_STORAGE_KEY));
+  }
+
+  function saveGuestDraftAndRedirectToRegister() {
+    location.href = "./auth.html?mode=register&fromDraft=1";
   }
 
   async function refreshFromServerIfLoggedIn() {
@@ -92,8 +129,13 @@
 
     const token = getToken();
     if (!token) {
-      slot.innerHTML =
-        '<a href="./auth.html" class="nav-pill">Войти</a>';
+      if (hasGuestDraft()) {
+        slot.innerHTML =
+          '<button type="button" class="btn btn-sm" data-auth-save-draft>Сохранить изменения</button> <a href="./auth.html" class="nav-pill">Войти</a>';
+      } else {
+        slot.innerHTML =
+          '<a href="./auth.html" class="nav-pill">Войти</a>';
+      }
       return;
     }
 
@@ -117,22 +159,34 @@
     if (logoutBound) return;
     logoutBound = true;
     document.body.addEventListener("click", function (e) {
+      const saveDraftBtn = e.target.closest("[data-auth-save-draft]");
+      if (saveDraftBtn) {
+        e.preventDefault();
+        saveGuestDraftAndRedirectToRegister();
+        return;
+      }
       const t = e.target.closest("[data-auth-logout]");
       if (!t) return;
       e.preventDefault();
       clearToken();
+      localStorage.removeItem(STORAGE_KEY);
       location.reload();
     });
   }
 
   async function syncAfterLogin(token) {
     setToken(token);
+    const guestRaw = localStorage.getItem(GUEST_STORAGE_KEY);
+    if (guestRaw) {
+      localStorage.setItem(STORAGE_KEY, guestRaw);
+    }
     try {
       const r = await fetch("/api/data", { headers: { Authorization: "Bearer " + token } });
       if (r.ok) {
         const j = await r.json();
         if (j.payload && typeof j.payload === "object" && hasMeaningfulPayload(j.payload)) {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(j.payload));
+          localStorage.removeItem(GUEST_STORAGE_KEY);
           return;
         }
       }
@@ -147,6 +201,7 @@
           headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
           body: raw,
         });
+        localStorage.removeItem(GUEST_STORAGE_KEY);
       } catch {
         /* ignore */
       }
@@ -155,11 +210,18 @@
 
   global.authSync = {
     STORAGE_KEY: STORAGE_KEY,
+    GUEST_STORAGE_KEY: GUEST_STORAGE_KEY,
     TOKEN_KEY: TOKEN_KEY,
     getToken: getToken,
     setToken: setToken,
     clearToken: clearToken,
     isLoggedIn: isLoggedIn,
+    getStorageKey: getStorageKey,
+    readActivePayload: readActivePayload,
+    writeActivePayload: writeActivePayload,
+    clearActivePayload: clearActivePayload,
+    hasGuestDraft: hasGuestDraft,
+    saveGuestDraftAndRedirectToRegister: saveGuestDraftAndRedirectToRegister,
     refreshFromServerIfLoggedIn: refreshFromServerIfLoggedIn,
     scheduleUpload: scheduleUpload,
     uploadNow: uploadNow,

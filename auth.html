@@ -61,8 +61,16 @@
     <script src="./api-client.js"></script>
     <script>
       (function () {
+        const params = new URLSearchParams(location.search);
+        const isRegisterMode = params.get("mode") === "register";
+
         function showErr(el, msg) {
           if (el) el.textContent = msg || "";
+        }
+
+        if (isRegisterMode) {
+          const regEmail = document.getElementById("regEmail");
+          if (regEmail) regEmail.focus();
         }
 
         document.getElementById("formLogin").addEventListener("submit", async function (e) {

@@ -7,6 +7,7 @@
 
 (() => {
   const STORAGE_KEY = "glosmoSchedule-v1";
+  const FALLBACK_GUEST_KEY = "glosmoSchedule-guest-v1";
 
   /** @type {{id:string,name:string,color:string,tasks:string[]}[]} */
   let colors = [];
@@ -81,12 +82,19 @@
     selectedColorId = colors[0].id;
   }
 
+  function storageKey() {
+    if (typeof window !== "undefined" && window.authSync && typeof window.authSync.getStorageKey === "function") {
+      return window.authSync.getStorageKey();
+    }
+    return STORAGE_KEY;
+  }
+
   function save() {
     let noteFolders = [];
     let selectedNoteFolderId = null;
     let selectedNoteItemId = null;
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(storageKey());
       if (raw) {
         const p = JSON.parse(raw);
         if (p && Array.isArray(p.noteFolders)) noteFolders = p.noteFolders;
@@ -109,14 +117,15 @@
       currentYear,
       currentMonthIndex,
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    localStorage.setItem(storageKey(), JSON.stringify(payload));
     if (typeof window !== "undefined" && window.authSync) {
       window.authSync.scheduleUpload();
+      window.authSync.refreshUserLabel().catch(() => {});
     }
   }
 
   function load() {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(storageKey());
     if (!raw) return;
     try {
       const payload = JSON.parse(raw);
@@ -637,7 +646,8 @@
     els.btnReset.addEventListener("click", () => {
       const ok = confirm("Сбросить все данные? Кружки, цвета, заметки к дням и папки с заметками будут удалены.");
       if (!ok) return;
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(storageKey());
+      localStorage.removeItem(FALLBACK_GUEST_KEY);
       colors = [];
       dotsByDate = {};
       dayNotes = {};

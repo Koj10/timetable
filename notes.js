@@ -33,8 +33,15 @@
     return "n_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16);
   }
 
+  function storageKey() {
+    if (typeof window !== "undefined" && window.authSync && typeof window.authSync.getStorageKey === "function") {
+      return window.authSync.getStorageKey();
+    }
+    return STORAGE_KEY;
+  }
+
   function readRaw() {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(storageKey());
     if (!raw) return null;
     try {
       return JSON.parse(raw);
@@ -117,9 +124,10 @@
     data.selectedNoteItemId = selectedNoteId;
     data.v = 3;
     delete data.scratchPadNotes;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(storageKey(), JSON.stringify(data));
     if (typeof window !== "undefined" && window.authSync) {
       window.authSync.scheduleUpload();
+      window.authSync.refreshUserLabel().catch(() => {});
     }
   }
 
