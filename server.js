@@ -11,24 +11,56 @@ const jwt = require("jsonwebtoken");
 const PORT = Number(process.env.PORT) || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-замените-в-продакшене";
 const ROOT = __dirname;
-const DATA_DIR = path.join(ROOT, "data");
+const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(ROOT, "data"));
 const STORE_FILE = path.join(DATA_DIR, "store.json");
+const STORE_TMP_FILE = path.join(DATA_DIR, "store.json.tmp");
+const STORE_BAK_FILE = path.join(DATA_DIR, "store.json.bak");
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
-function loadStore() {
-  if (!fs.existsSync(STORE_FILE)) {
-    return { nextId: 1, users: [] };
-  }
+function defaultStore() {
+  return { nextId: 1, users: [] };
+}
+
+function normalizeStore(raw) {
+  if (!raw || typeof raw !== "object") return defaultStore();
+  const users = Array.isArray(raw.users) ? raw.users.filter((u) => u && typeof u === "object") : [];
+  const nextId = Number.isInteger(raw.nextId) && raw.nextId > 0 ? raw.nextId : users.length + 1;
+  return { nextId, users };
+}
+
+function readStoreFile(filePath) {
+  if (!fs.existsSync(filePath)) return null;
   try {
-    return JSON.parse(fs.readFileSync(STORE_FILE, "utf8"));
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
   } catch {
-    return { nextId: 1, users: [] };
+    return null;
   }
 }
 
+function loadStore() {
+  const primary = readStoreFile(STORE_FILE);
+  if (primary) return normalizeStore(primary);
+
+  const backup = readStoreFile(STORE_BAK_FILE);
+  if (backup) {
+    const recovered = normalizeStore(backup);
+    try {
+      fs.writeFileSync(STORE_FILE, JSON.stringify(recovered), "utf8");
+    } catch {
+      // ignore restore errors and continue with recovered in memory
+    }
+    return recovered;
+  }
+
+  return defaultStore();
+}
+
 function saveStore(store) {
-  fs.writeFileSync(STORE_FILE, JSON.stringify(store), "utf8");
+  const payload = JSON.stringify(normalizeStore(store));
+  fs.writeFileSync(STORE_TMP_FILE, payload, "utf8");
+  if (fs.existsSync(STORE_FILE)) fs.copyFileSync(STORE_FILE, STORE_BAK_FILE);
+  fs.renameSync(STORE_TMP_FILE, STORE_FILE);
 }
 
 function getUserById(store, id) {

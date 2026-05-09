@@ -16,7 +16,14 @@ cd /var/www/planote
 npm ci
 ```
 
-Create `.env.production` from `.env.production.example` and set a secure `JWT_SECRET`.
+Create `.env.production` from `.env.production.example`, set a secure `JWT_SECRET`, and keep `DATA_DIR` on a persistent disk (example: `/var/lib/planote/data`).
+
+Create the directory once:
+
+```bash
+sudo mkdir -p /var/lib/planote/data
+sudo chown -R $USER:$USER /var/lib/planote/data
+```
 
 ## 3) Start app with PM2
 
@@ -69,3 +76,16 @@ sudo nginx -T | rg "server_name|listen"
 ```
 
 If Certbot says no matching server block, verify `server_name planote.ru www.planote.ru;` in active config and reload Nginx.
+
+## 8) If running in Docker
+
+Always mount a persistent volume for app data, otherwise users and notes are lost after container recreation/reboot:
+
+```bash
+docker run -d \
+  --name planote \
+  -p 3002:3000 \
+  --env-file .env.production \
+  -v /var/lib/planote/data:/var/lib/planote/data \
+  planote:latest
+```
